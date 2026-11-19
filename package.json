@@ -2,13 +2,14 @@
   "name": "lyra-agentic-os",
   "version": "0.1.0",
   "private": true,
-  "description": "Lyra Agentic OS — a unified harness where Claude Code, Antigravity, Hermes and Codex collaborate.",
+  "description": "Lyra Agentic OS \u2014 a unified harness where Claude Code, Antigravity, Hermes and Codex collaborate.",
   "scripts": {
     "dev": "next dev -H 0.0.0.0 -p 3000",
     "build": "next build",
     "start": "next start -H 0.0.0.0 -p 3000",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "proof": "node scripts/render-hero.mjs"
   },
   "dependencies": {
     "@fontsource/cormorant-garamond": "5.3.0",
@@ -28,6 +29,7 @@
     "zustand": "5.1.0"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/postcss": "4.3.5",
     "@types/node": "22.18.0",
     "@types/react": "19.3.0",

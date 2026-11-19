@@ -117,7 +117,7 @@ export function SunDisc() {
     }
   });
   return (
-    <group position={[0.34, 0.8, -2.65]}>
+    <group position={[0.62, 0.8, -2.65]}>
       <mesh ref={ref}>
         <circleGeometry args={[2.0, 96]} />
         <meshBasicMaterial color="#c98a45" transparent opacity={0.13} toneMapped={false} />

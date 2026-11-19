@@ -123,7 +123,8 @@ function SceneContent({
   const aspect = width / Math.max(1, height);
   // Keep every sigil inside the frustum: on portrait screens the visible
   // half-width is far narrower, so the orbit contracts with it.
-  const sigilRadius = aspect > 1.25 ? 1.95 : aspect > 0.9 ? 1.7 : 1.35;
+  const sigilRadius = aspect > 1.25 ? 2.15 : aspect > 0.9 ? 1.95 : 1.05;
+  const sigilSize = aspect > 1.25 ? 1 : aspect > 0.9 ? 0.86 : 0.62;
 
   return (
     <>
@@ -134,7 +135,7 @@ function SceneContent({
       <SunDisc />
       <Suspense fallback={null}>
         <Float speed={1.1} rotationIntensity={0.06} floatIntensity={0.28}>
-          <LyraBust pointer={pointer} position={[0.34, -0.22, 0]} />
+          <LyraBust pointer={pointer} position={[0.62, -0.22, 0]} />
         </Float>
       </Suspense>
       <HaloDust />
@@ -148,6 +149,7 @@ function SceneContent({
           index={i}
           total={HARNESSES.length}
           radius={sigilRadius}
+          size={sigilSize}
           color={h.accent}
           accentSoft={h.accentSoft}
           name={h.name}
