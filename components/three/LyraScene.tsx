@@ -6,7 +6,7 @@ import { EffectComposer, Bloom, Vignette, Noise } from "@react-three/postprocess
 import { BlendFunction } from "postprocessing";
 import { Suspense, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
-import LabelSprite from "./LabelSprite";
+import HarnessSigil from "./HarnessSigil";
 import { HARNESSES } from "@/lib/harnesses";
 
 /* ------------------------------------------------------------------ */
@@ -140,68 +140,6 @@ function LyraBust({ pointer }: { pointer: React.RefObject<{ x: number; y: number
 }
 
 /* ------------------------------------------------------------------ */
-/*  Four harness motes orbiting the bust, labelled                      */
-/* ------------------------------------------------------------------ */
-function HarnessNode({
-  index,
-  total,
-  color,
-  name,
-  radius = 2.55,
-  onHover,
-}: {
-  index: number;
-  total: number;
-  color: string;
-  name: string;
-  radius?: number;
-  onHover: (v: string | null) => void;
-}) {
-  const ref = useRef<THREE.Group>(null);
-  const [hovered, setHovered] = useState(false);
-
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime();
-    const a = (index / total) * Math.PI * 2 + t * 0.11;
-    if (ref.current) {
-      ref.current.position.set(
-        Math.cos(a) * radius * 1.18,
-        Math.sin(a * 1.0) * 0.42 + 0.55,
-        Math.sin(a) * radius * 0.55
-      );
-      const s = hovered ? 1.5 : 1;
-      ref.current.scale.lerp(new THREE.Vector3(s, s, s), 0.12);
-    }
-  });
-
-  return (
-    <group ref={ref}>
-      <mesh
-        onPointerOver={(e) => {
-          e.stopPropagation();
-          setHovered(true);
-          onHover(name);
-        }}
-        onPointerOut={() => {
-          setHovered(false);
-          onHover(null);
-        }}
-      >
-        <sphereGeometry args={[0.075, 24, 24]} />
-        <meshBasicMaterial color={color} toneMapped={false} />
-      </mesh>
-      <mesh>
-        <sphereGeometry args={[0.19, 24, 24]} />
-        <meshBasicMaterial color={color} transparent opacity={0.16} blending={THREE.AdditiveBlending} />
-      </mesh>
-      <group position={[0, -0.29, 0]}>
-        <LabelSprite text={name.toUpperCase()} color={hovered ? "#fff6e6" : "#cbb79a"} scale={hovered ? 1.15 : 1} />
-      </group>
-    </group>
-  );
-}
-
-/* ------------------------------------------------------------------ */
 /*  Sun disc behind her                                                */
 /* ------------------------------------------------------------------ */
 function SunDisc() {
@@ -272,11 +210,13 @@ function SceneContent({
       <OrbitRing radius={2.62} tilt={[Math.PI / 1.9, 0.5, 0.3]} speed={-0.1} color="#8fe3d8" opacity={0.14} />
       <OrbitRing radius={3.15} tilt={[Math.PI / 2.6, -0.3, 0]} speed={0.07} color="#e08a52" opacity={0.1} />
       {HARNESSES.map((h, i) => (
-        <HarnessNode
+        <HarnessSigil
           key={h.id}
+          id={h.id}
           index={i}
           total={HARNESSES.length}
           color={h.accent}
+          accentSoft={h.accentSoft}
           name={h.name}
           onHover={onHover}
         />
