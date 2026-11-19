@@ -7,15 +7,10 @@ import { useFrame } from "@react-three/fiber";
 import { LOGO_SVG } from "@/lib/logos";
 import LabelSprite from "./LabelSprite";
 
-/** Optical size of the extruded glyph, in scene units. */
-const GLYPH_TARGET = 0.23;
-/** Medallion proportions, in scene units. */
-const R = {
-  halo: 0.245,
-  face: 0.172,
-  innerRing: 0.15,
-  outerRing: 0.176,
-};
+/** Optical size of the extruded glyph, in scene units. This is the hero. */
+const GLYPH_TARGET = 0.46;
+/** Thin orbit accent that frames the glyph without turning it into a coin. */
+const ARC_R = 0.36;
 
 /**
  * Builds extruded geometry from a 24×24 SVG glyph, normalised so every harness
@@ -36,10 +31,10 @@ function useGlyphGeometry(id: string) {
     if (shapes.length === 0) return null;
 
     const geo = new THREE.ExtrudeGeometry(shapes, {
-      depth: 0.045,
+      depth: 0.07,
       bevelEnabled: true,
-      bevelThickness: 0.006,
-      bevelSize: 0.006,
+      bevelThickness: 0.008,
+      bevelSize: 0.008,
       bevelSegments: 2,
       curveSegments: 9,
     });
@@ -92,27 +87,27 @@ export default function HarnessSigil({
 
     if (group.current) {
       group.current.position.set(
-        Math.cos(a) * radius * 1.18,
-        Math.sin(a * 0.9) * 0.42 + 0.55,
-        Math.sin(a) * radius * 0.55
+        Math.cos(a) * radius * 1.16,
+        Math.sin(a * 0.9) * 0.4 + 0.5,
+        Math.sin(a) * radius * 0.5
       );
-      const s = hovered ? 1.35 : 1;
+      const s = hovered ? 1.3 : 1;
       scaleTarget.current.set(s, s, s);
       group.current.scale.lerp(scaleTarget.current, 0.1);
     }
 
-    // the medallion always presents its face, like a coin catching the light,
-    // with a slow independent turn of the glyph for depth.
+    // The glyph presents its face to the viewer but keeps a slow independent
+    // turn, so the extrusion catches light and reads as a solid object.
     if (face.current) {
       face.current.quaternion.copy(camera.quaternion);
-      face.current.rotateZ(Math.sin(t * 0.45 + index * 1.7) * 0.06);
-      face.current.rotateY(Math.sin(t * 0.6 + index) * 0.22);
+      face.current.rotateZ(Math.sin(t * 0.4 + index * 1.7) * 0.05);
+      face.current.rotateY(Math.sin(t * 0.55 + index) * 0.3);
     }
   });
 
   return (
     <group ref={group}>
-      {/* generous invisible hit area — easier to hover on touch and desktop */}
+      {/* generous invisible hit area — easy to hover on desktop and touch */}
       <mesh
         onPointerOver={(e) => {
           e.stopPropagation();
@@ -124,56 +119,70 @@ export default function HarnessSigil({
           onHover(null);
         }}
       >
-        <circleGeometry args={[0.24, 24]} />
+        <circleGeometry args={[0.38, 24]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
 
       <group ref={face}>
-        {/* hover bloom */}
+        {/* soft halo — identity colour, no hard edge */}
         <mesh>
-          <circleGeometry args={[R.halo, 32]} />
+          <circleGeometry args={[0.5, 48]} />
           <meshBasicMaterial
             color={color}
             transparent
-            opacity={hovered ? 0.3 : 0.13}
+            opacity={hovered ? 0.22 : 0.1}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             toneMapped={false}
           />
         </mesh>
 
-        {/* dark medallion face */}
-        <mesh position={[0, 0, -0.004]}>
-          <circleGeometry args={[R.face, 56]} />
-          <meshBasicMaterial color="#0a0810" transparent opacity={0.9} depthWrite={false} />
+        {/* thin orbit arc framing the glyph (not a closed ring) */}
+        <mesh position={[0, 0, -0.02]}>
+          <torusGeometry args={[ARC_R, 0.0028, 3, 96, Math.PI * 1.55]} />
+          <meshBasicMaterial
+            color={color}
+            transparent
+            opacity={hovered ? 0.95 : 0.6}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            toneMapped={false}
+          />
+        </mesh>
+        <mesh position={[0, 0, -0.02]} rotation={[0, 0, Math.PI * 1.1]}>
+          <torusGeometry args={[ARC_R, 0.0022, 3, 64, Math.PI * 0.55]} />
+          <meshBasicMaterial
+            color={accentSoft}
+            transparent
+            opacity={hovered ? 0.7 : 0.35}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            toneMapped={false}
+          />
         </mesh>
 
-        {/* rim + inner ring */}
-        <mesh position={[0, 0, -0.003]}>
-          <ringGeometry args={[R.outerRing - 0.004, R.outerRing, 56]} />
-          <meshBasicMaterial color={color} transparent opacity={0.85} depthWrite={false} toneMapped={false} />
-        </mesh>
-        <mesh position={[0, 0, -0.003]}>
-          <ringGeometry args={[R.innerRing, R.innerRing + 0.0025, 56]} />
-          <meshBasicMaterial color={color} transparent opacity={0.3} depthWrite={false} toneMapped={false} />
-        </mesh>
-
-        {/* extruded logo */}
+        {/* extruded glyph — bright face plus an additive bloom shell */}
         {geo && (
           <>
-            <mesh geometry={geo} position={[0, 0, 0.001]}>
+            <mesh geometry={geo}>
               <meshBasicMaterial color={accentSoft} toneMapped={false} />
             </mesh>
-            {/* soft backing plate so dark glyphs still read against the void */}
-            <mesh geometry={geo} position={[0, 0, -0.006]} scale={1.09}>
-              <meshBasicMaterial color={color} transparent opacity={0.42} toneMapped={false} depthWrite={false} />
+            <mesh geometry={geo} position={[0, 0, -0.03]} scale={1.14}>
+              <meshBasicMaterial
+                color={color}
+                transparent
+                opacity={0.75}
+                blending={THREE.AdditiveBlending}
+                toneMapped={false}
+                depthWrite={false}
+              />
             </mesh>
           </>
         )}
       </group>
 
-      <group position={[0, -0.275, 0]}>
-        <LabelSprite text={name.toUpperCase()} color={hovered ? "#fff6e6" : "#cbb79a"} scale={hovered ? 1.18 : 1} />
+      <group position={[0, -0.45, 0]}>
+        <LabelSprite text={name.toUpperCase()} color={hovered ? "#fff6e6" : "#cbb79a"} scale={hovered ? 1.25 : 1.05} />
       </group>
     </group>
   );

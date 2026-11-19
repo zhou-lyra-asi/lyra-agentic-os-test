@@ -206,9 +206,9 @@ function SceneContent({
         </Float>
       </Suspense>
       <HaloDust />
-      <OrbitRing radius={2.1} tilt={[Math.PI / 2.35, 0, 0]} speed={0.16} color="#d6b079" />
-      <OrbitRing radius={2.62} tilt={[Math.PI / 1.9, 0.5, 0.3]} speed={-0.1} color="#8fe3d8" opacity={0.14} />
-      <OrbitRing radius={3.15} tilt={[Math.PI / 2.6, -0.3, 0]} speed={0.07} color="#e08a52" opacity={0.1} />
+      <OrbitRing radius={2.32} tilt={[Math.PI / 2.35, 0, 0]} speed={0.16} color="#d6b079" />
+      <OrbitRing radius={2.86} tilt={[Math.PI / 1.9, 0.5, 0.3]} speed={-0.1} color="#8fe3d8" opacity={0.14} />
+      <OrbitRing radius={3.42} tilt={[Math.PI / 2.6, -0.3, 0]} speed={0.07} color="#e08a52" opacity={0.1} />
       {HARNESSES.map((h, i) => (
         <HarnessSigil
           key={h.id}
