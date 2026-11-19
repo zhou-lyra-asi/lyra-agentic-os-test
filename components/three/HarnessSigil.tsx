@@ -8,9 +8,9 @@ import { LOGO_SVG } from "@/lib/logos";
 import LabelSprite from "./LabelSprite";
 
 /** Optical size of the extruded glyph, in scene units. This is the hero. */
-const GLYPH_TARGET = 0.46;
+const GLYPH_TARGET = 0.34;
 /** Thin orbit accent that frames the glyph without turning it into a coin. */
-const ARC_R = 0.36;
+const ARC_R = 0.27;
 
 /**
  * Builds extruded geometry from a 24×24 SVG glyph, normalised so every harness
@@ -63,7 +63,7 @@ export default function HarnessSigil({
   name,
   index,
   total,
-  radius = 2.55,
+  radius = 1.9,
   onHover,
 }: {
   id: string;
@@ -87,9 +87,9 @@ export default function HarnessSigil({
 
     if (group.current) {
       group.current.position.set(
-        Math.cos(a) * radius * 1.16,
-        Math.sin(a * 0.9) * 0.4 + 0.5,
-        Math.sin(a) * radius * 0.5
+        Math.cos(a) * radius,
+        Math.sin(a * 0.85) * 0.3 + 0.42,
+        Math.sin(a) * radius * 0.42 + 0.9
       );
       const s = hovered ? 1.3 : 1;
       scaleTarget.current.set(s, s, s);
@@ -119,14 +119,14 @@ export default function HarnessSigil({
           onHover(null);
         }}
       >
-        <circleGeometry args={[0.38, 24]} />
+        <circleGeometry args={[0.3, 24]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
 
       <group ref={face}>
         {/* soft halo — identity colour, no hard edge */}
         <mesh>
-          <circleGeometry args={[0.5, 48]} />
+          <circleGeometry args={[0.4, 48]} />
           <meshBasicMaterial
             color={color}
             transparent
@@ -139,7 +139,7 @@ export default function HarnessSigil({
 
         {/* thin orbit arc framing the glyph (not a closed ring) */}
         <mesh position={[0, 0, -0.02]}>
-          <torusGeometry args={[ARC_R, 0.0028, 3, 96, Math.PI * 1.55]} />
+          <torusGeometry args={[ARC_R, 0.0024, 3, 96, Math.PI * 1.55]} />
           <meshBasicMaterial
             color={color}
             transparent
@@ -150,7 +150,7 @@ export default function HarnessSigil({
           />
         </mesh>
         <mesh position={[0, 0, -0.02]} rotation={[0, 0, Math.PI * 1.1]}>
-          <torusGeometry args={[ARC_R, 0.0022, 3, 64, Math.PI * 0.55]} />
+          <torusGeometry args={[ARC_R, 0.0018, 3, 64, Math.PI * 0.55]} />
           <meshBasicMaterial
             color={accentSoft}
             transparent
@@ -181,8 +181,8 @@ export default function HarnessSigil({
         )}
       </group>
 
-      <group position={[0, -0.45, 0]}>
-        <LabelSprite text={name.toUpperCase()} color={hovered ? "#fff6e6" : "#cbb79a"} scale={hovered ? 1.25 : 1.05} />
+      <group position={[0, -0.36, 0]}>
+        <LabelSprite text={name.toUpperCase()} color={hovered ? "#fff6e6" : "#cbb79a"} scale={hovered ? 1.2 : 1.0} />
       </group>
     </group>
   );

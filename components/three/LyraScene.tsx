@@ -1,12 +1,13 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Float, useTexture } from "@react-three/drei";
+import { Float } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette, Noise } from "@react-three/postprocessing";
 import { BlendFunction } from "postprocessing";
 import { Suspense, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import HarnessSigil from "./HarnessSigil";
+import LyraBust, { SunDisc } from "./LyraBust";
 import { HARNESSES } from "@/lib/harnesses";
 
 /* ------------------------------------------------------------------ */
@@ -96,82 +97,6 @@ function OrbitRing({
 }
 
 /* ------------------------------------------------------------------ */
-/*  The Lyra bust, as a luminous holographic plane                     */
-/* ------------------------------------------------------------------ */
-function LyraBust({ pointer }: { pointer: React.RefObject<{ x: number; y: number }> }) {
-  const tex = useTexture("/assets/lyra-bust.webp");
-  const group = useRef<THREE.Group>(null);
-  const mat = useRef<THREE.MeshBasicMaterial>(null);
-
-  useFrame(({ clock, pointer: p }) => {
-    const t = clock.getElapsedTime();
-    if (group.current) {
-      const px = pointer.current?.x ?? 0;
-      const py = pointer.current?.y ?? 0;
-      group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, px * 0.16, 0.05);
-      group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, -py * 0.07, 0.05);
-      group.current.position.y = Math.sin(t * 0.7) * 0.035 - 0.02;
-    }
-    if (mat.current) {
-      mat.current.opacity = 0.94 + Math.sin(t * 2.1) * 0.02;
-    }
-  });
-
-  return (
-    <group ref={group}>
-      <mesh>
-        <planeGeometry args={[2.61, 3.25]} />
-        <meshBasicMaterial
-          ref={mat}
-          map={tex}
-          transparent
-          toneMapped={false}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-        />
-      </mesh>
-      {/* soft silhouette to seat the figure in the dark */}
-      <mesh position={[0, 0, -0.05]}>
-        <planeGeometry args={[2.82, 3.42]} />
-        <meshBasicMaterial map={tex} transparent opacity={0.06} toneMapped={false} depthWrite={false} />
-      </mesh>
-    </group>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  Sun disc behind her                                                */
-/* ------------------------------------------------------------------ */
-function SunDisc() {
-  const ref = useRef<THREE.Mesh>(null);
-  useFrame(({ clock }) => {
-    if (ref.current) {
-      const t = clock.getElapsedTime();
-      const s = 1 + Math.sin(t * 0.5) * 0.015;
-      ref.current.scale.set(s, s, 1);
-    }
-  });
-  return (
-    <group position={[0, 0.62, -2.4]}>
-      <mesh ref={ref}>
-        <circleGeometry args={[2.05, 96]} />
-        <meshBasicMaterial color="#c98a45" transparent opacity={0.16} toneMapped={false} />
-      </mesh>
-      <mesh position={[0, 0, -0.01]}>
-        <circleGeometry args={[2.35, 96]} />
-        <meshBasicMaterial
-          color="#e8a45c"
-          transparent
-          opacity={0.07}
-          blending={THREE.AdditiveBlending}
-          toneMapped={false}
-        />
-      </mesh>
-    </group>
-  );
-}
-
-/* ------------------------------------------------------------------ */
 /*  Pointer parallax rig                                               */
 /* ------------------------------------------------------------------ */
 function Rig({ pointer }: { pointer: React.RefObject<{ x: number; y: number }> }) {
@@ -179,9 +104,9 @@ function Rig({ pointer }: { pointer: React.RefObject<{ x: number; y: number }> }
   useFrame(() => {
     const px = pointer.current?.x ?? 0;
     const py = pointer.current?.y ?? 0;
-    camera.position.x = THREE.MathUtils.lerp(camera.position.x, px * 0.42, 0.04);
-    camera.position.y = THREE.MathUtils.lerp(camera.position.y, 0.1 - py * 0.24, 0.04);
-    camera.lookAt(0, 0.12, 0);
+    camera.position.x = THREE.MathUtils.lerp(camera.position.x, px * 0.3, 0.04);
+    camera.position.y = THREE.MathUtils.lerp(camera.position.y, 0.06 - py * 0.18, 0.04);
+    camera.lookAt(0, 0.1, 0);
   });
   return null;
 }
@@ -193,6 +118,13 @@ function SceneContent({
   pointer: React.RefObject<{ x: number; y: number }>;
   onHover: (v: string | null) => void;
 }) {
+  const width = useThree((s) => s.size.width);
+  const height = useThree((s) => s.size.height);
+  const aspect = width / Math.max(1, height);
+  // Keep every sigil inside the frustum: on portrait screens the visible
+  // half-width is far narrower, so the orbit contracts with it.
+  const sigilRadius = aspect > 1.25 ? 1.95 : aspect > 0.9 ? 1.7 : 1.35;
+
   return (
     <>
       <color attach="background" args={["#060509"]} />
@@ -202,19 +134,20 @@ function SceneContent({
       <SunDisc />
       <Suspense fallback={null}>
         <Float speed={1.1} rotationIntensity={0.06} floatIntensity={0.28}>
-          <LyraBust pointer={pointer} />
+          <LyraBust pointer={pointer} position={[0.34, -0.22, 0]} />
         </Float>
       </Suspense>
       <HaloDust />
-      <OrbitRing radius={2.32} tilt={[Math.PI / 2.35, 0, 0]} speed={0.16} color="#d6b079" />
-      <OrbitRing radius={2.86} tilt={[Math.PI / 1.9, 0.5, 0.3]} speed={-0.1} color="#8fe3d8" opacity={0.14} />
-      <OrbitRing radius={3.42} tilt={[Math.PI / 2.6, -0.3, 0]} speed={0.07} color="#e08a52" opacity={0.1} />
+      <OrbitRing radius={1.62} tilt={[Math.PI / 2.4, 0, 0]} speed={0.16} color="#d6b079" />
+      <OrbitRing radius={2.02} tilt={[Math.PI / 1.95, 0.5, 0.3]} speed={-0.1} color="#8fe3d8" opacity={0.14} />
+      <OrbitRing radius={2.3} tilt={[Math.PI / 2.7, -0.3, 0]} speed={0.07} color="#e08a52" opacity={0.1} />
       {HARNESSES.map((h, i) => (
         <HarnessSigil
           key={h.id}
           id={h.id}
           index={i}
           total={HARNESSES.length}
+          radius={sigilRadius}
           color={h.accent}
           accentSoft={h.accentSoft}
           name={h.name}
@@ -248,7 +181,7 @@ export default function LyraScene() {
       <Canvas
         dpr={[1, 1.8]}
         gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
-        camera={{ position: [0, 0.1, 7.2], fov: 38 }}
+        camera={{ position: [0, 0.1, 9.6], fov: 40 }}
       >
         <SceneContent pointer={pointer} onHover={setHoverName} />
       </Canvas>
