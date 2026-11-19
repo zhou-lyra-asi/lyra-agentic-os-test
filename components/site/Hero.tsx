@@ -29,7 +29,8 @@ export default function Hero() {
       {/* legibility scrims */}
       <div className="pointer-events-none absolute inset-0 vignette" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-void via-void/70 to-transparent" />
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-[42%] bg-gradient-to-r from-void/88 via-void/40 to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 left-0 hidden w-[42%] bg-gradient-to-r from-void/88 via-void/40 to-transparent sm:block" />
+      <div className="pointer-events-none absolute inset-0 bg-void/55 sm:hidden" />
 
       {/* copy */}
       <div className="relative z-10 mx-auto flex h-full max-w-[1320px] flex-col justify-center px-5 pt-24 sm:px-8">

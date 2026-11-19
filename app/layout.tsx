@@ -13,6 +13,7 @@ import "@fontsource/jetbrains-mono/500.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://lyra-agentic-os.local"),
   title: "Lyra Agentic OS — Empat Harness, Satu Jiwa",
   description:
     "Sistem operasi agentic yang menyatukan Claude Code, Antigravity, Hermes, dan Codex dalam satu harness terintegrasi — untuk desktop dan CLI.",
