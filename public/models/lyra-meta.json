@@ -1,0 +1,48 @@
+{
+  "name": "Lyra · Holographic Reconstruction",
+  "version": "1.0.0",
+  "source": "lyra-prime.png",
+  "references": [
+    "Moonlit Fantasy Romance Retreat",
+    "Sunset Fantasy Empress",
+    "Golden Blindfold at Sunset"
+  ],
+  "points": 28200,
+  "surfacePoints": 26000,
+  "haloPoints": 2200,
+  "reliefGrid": [
+    72,
+    96
+  ],
+  "bounds": {
+    "x": [
+      -1.524284839630127,
+      1.519216775894165
+    ],
+    "y": [
+      -2.042210578918457,
+      2.2753822803497314
+    ],
+    "z": [
+      -1.2987594604492188,
+      0.9605792760848999
+    ]
+  },
+  "pipeline": "luminance + edge energy + elliptical volume prior + posterior shell",
+  "texture": "lyra-prime.jpg",
+  "cards": [
+    {
+      "file": "card-01.jpg",
+      "title": "Moonlit Fantasy Romance Retreat"
+    },
+    {
+      "file": "card-02.jpg",
+      "title": "Sunset Fantasy Empress"
+    },
+    {
+      "file": "card-03.jpg",
+      "title": "Golden Blindfold at Sunset"
+    }
+  ],
+  "download": "lyra-pointcloud.ply"
+}
